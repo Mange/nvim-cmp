@@ -267,7 +267,7 @@ custom_entries_view._select = function(self, cursor, option)
   local is_insert = (option.behavior or types.cmp.SelectBehavior.Insert) == types.cmp.SelectBehavior.Insert
   if is_insert then
     if vim.api.nvim_win_get_cursor(self.entries_win.win)[2] == 1 then
-      self.prefix = string.sub(vim.api.nvim_get_current_line(), self.offset, vim.api.nvim_win_get_cursor(0)[2]) or ''
+      self.prefix = string.sub(api.get_current_line(), self.offset, api.get_cursor()[2]) or ''
     end
   end
 
@@ -283,13 +283,11 @@ custom_entries_view._select = function(self, cursor, option)
 end
 
 custom_entries_view._insert = function(self, word)
-  if not api.is_insert_mode() then
-    local cursor = api.get_cursor()
-    local length = vim.str_utfindex(string.sub(api.get_current_line(), self.offset, cursor[2]))
-    return keymap.feedkeys(keymap.backspace(length) .. word, 'n')
-  end
-
   vim.api.nvim_buf_set_keymap(0, 'i', '<Plug>(cmp.view.custom_entries_view._insert.remove)', ('v:lua.cmp.view.custom_entries_view._insert.remove(%s)'):format(self.offset), {
+    expr = true,
+    noremap = true,
+  })
+  vim.api.nvim_buf_set_keymap(0, 'c', '<Plug>(cmp.view.custom_entries_view._insert.remove)', ('v:lua.cmp.view.custom_entries_view._insert.remove(%s)'):format(self.offset), {
     expr = true,
     noremap = true,
   })
@@ -298,8 +296,8 @@ custom_entries_view._insert = function(self, word)
 end
 
 misc.set(_G, { 'cmp', 'view', 'custom_entries_view', '_insert', 'remove' }, function(offset)
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  local length = vim.str_utfindex(string.sub(vim.api.nvim_get_current_line(), offset, cursor[2]))
+  local cursor = api.get_cursor()
+  local length = vim.str_utfindex(string.sub(api.get_current_line(), offset, cursor[2]))
   return keymap.backspace(length)
 end)
 
