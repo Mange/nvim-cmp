@@ -291,8 +291,9 @@ custom_entries_view._insert = function(self, word)
     expr = true,
     noremap = true,
   })
+  local release = require('cmp').core:suspend()
   keymap.feedkeys(keymap.t('<Plug>(cmp.view.custom_entries_view._insert.remove)'), 't')
-  keymap.feedkeys(word, 'nt')
+  keymap.feedkeys(word, 'nt', vim.schedule_wrap(release))
 end
 
 misc.set(_G, { 'cmp', 'view', 'custom_entries_view', '_insert', 'remove' }, function(offset)
